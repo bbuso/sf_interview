@@ -6,8 +6,11 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
+	"reflect"
 	"sync"
 )
 
@@ -69,5 +72,31 @@ func ByteCompressor(reader io.ReadCloser) BufferedResponse {
 }
 
 func main() {
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, "https://www.google.com/", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	response := ByteCompressor(resp.Body)
+	fmt.Println(reflect.TypeOf(response))
+	// test_err := os.WriteFile("./test.html.gz", response, 0644)
+	// if test_err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// readCSVFile("./testdata/TestProcessEligibleChannel2_0_TestProcessEligibleChannel2_0_CODES.csv")
+	files, _ := ioutil.ReadDir("./testdata")
+	paths := []string{}
+	for _, file := range files {
+		filepath := "./testdata/" + file.Name()
+		paths = append(paths, filepath)
+	}
+	readCSVFiles(paths)
 
 }
